@@ -13,12 +13,14 @@ export function SettingsScreen({
   categories,
   onReset,
   userName,
+  calendarConnected,
 }: {
   setCurrent: (screen: string) => void;
   onSignOut: () => void;
   categories: string[];
   onReset: () => void;
   userName?: string;
+  calendarConnected?: boolean;
 }) {
   const { lang, setLang, t } = useLanguage();
 
@@ -92,11 +94,19 @@ export function SettingsScreen({
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-medium text-slate-900">{t.settings.googleCalendar}</div>
-                <div className="text-sm text-slate-500">Connected</div>
+                <div className="text-sm text-slate-500">
+                  {calendarConnected ? t.settings.connected : "Not connected"}
+                </div>
               </div>
-              <Badge className="rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-100">
-                {t.settings.connected}
-              </Badge>
+              {calendarConnected ? (
+                <Badge className="rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-100">
+                  {t.settings.connected}
+                </Badge>
+              ) : (
+                <Badge className="rounded-full bg-slate-100 text-slate-500 hover:bg-slate-100">
+                  —
+                </Badge>
+              )}
             </div>
           </CardContent>
         </Card>

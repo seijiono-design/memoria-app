@@ -10,6 +10,7 @@ export type AnniversaryItem = {
   notifyWeekBefore: boolean;
   notifyMilestoneBefore: boolean;
   googleCalendar: boolean;
+  calendarEventId?: string;
 };
 
 export type MilestoneInfo = {
