@@ -3,29 +3,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppShell } from "@/components/memoria/app-shell";
+import { useLanguage } from "@/lib/memoria/language-context";
+import { Lang } from "@/lib/memoria/i18n";
 
 export function SettingsScreen({
   setCurrent,
   onSignOut,
   categories,
   onReset,
+  userName,
 }: {
   setCurrent: (screen: string) => void;
   onSignOut: () => void;
   categories: string[];
   onReset: () => void;
+  userName?: string;
 }) {
+  const { lang, setLang, t } = useLanguage();
+
   return (
-    <AppShell title="Settings">
+    <AppShell title={t.titles.settings}>
       <div className="space-y-4">
         <Card className="rounded-3xl border-0 shadow-md">
           <CardContent className="flex items-center justify-between gap-4 p-5">
             <div>
-              <div className="text-sm text-slate-500">Account</div>
-              <div className="mt-1 font-semibold">Seiji Ohno</div>
-              <div className="text-sm text-slate-500">Signed in with Google</div>
+              <div className="text-sm text-slate-500">{t.settings.account}</div>
+              <div className="mt-1 font-semibold text-slate-900">{userName || "Seiji Ohno"}</div>
+              <div className="text-sm text-slate-500">{t.settings.signedIn}</div>
             </div>
             <Badge className="rounded-full bg-slate-100 text-slate-800 hover:bg-slate-100">Google</Badge>
           </CardContent>
@@ -35,24 +40,29 @@ export function SettingsScreen({
           <CardContent className="p-5">
             <div className="mb-4 flex items-center gap-3">
               <Globe className="h-5 w-5 text-slate-800" />
-              <div className="font-semibold">Language</div>
+              <div className="font-semibold text-slate-900">{t.settings.language}</div>
             </div>
-            <Tabs defaultValue="en">
-              <TabsList className="grid w-full grid-cols-2 rounded-2xl">
-                <TabsTrigger value="ja" className="rounded-2xl">
-                  日本語
-                </TabsTrigger>
-                <TabsTrigger value="en" className="rounded-2xl">
-                  English
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="flex rounded-2xl bg-slate-100 p-1 gap-1">
+              {(["ja", "en"] as Lang[]).map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={`flex-1 rounded-xl py-2 text-sm font-semibold transition ${
+                    lang === l
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  {l === "ja" ? "日本語" : "English"}
+                </button>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
         <Card className="rounded-3xl border-0 shadow-md">
           <CardContent className="space-y-4 p-5">
-            <div className="font-semibold">Categories</div>
+            <div className="font-semibold text-slate-900">{t.settings.categories}</div>
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <Badge key={category} className="rounded-full bg-slate-100 text-slate-800 hover:bg-slate-100">
@@ -67,25 +77,25 @@ export function SettingsScreen({
           <CardContent className="space-y-4 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">Default notification</div>
-                <div className="text-sm text-slate-500">1 week before each event</div>
+                <div className="font-medium text-slate-900">{t.settings.defaultNotification}</div>
+                <div className="text-sm text-slate-500">{t.settings.defaultNotificationDesc}</div>
               </div>
               <Switch checked />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">Milestone notification</div>
-                <div className="text-sm text-slate-500">3 days before 1000, 2000, 3000 days</div>
+                <div className="font-medium text-slate-900">{t.settings.milestoneNotification}</div>
+                <div className="text-sm text-slate-500">{t.settings.milestoneNotificationDesc}</div>
               </div>
               <Switch checked />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">Google Calendar</div>
-                <div className="text-sm text-slate-500">Connected to seiji@example.com</div>
+                <div className="font-medium text-slate-900">{t.settings.googleCalendar}</div>
+                <div className="text-sm text-slate-500">Connected</div>
               </div>
               <Badge className="rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-100">
-                Connected
+                {t.settings.connected}
               </Badge>
             </div>
           </CardContent>
@@ -93,15 +103,15 @@ export function SettingsScreen({
 
         <Card className="rounded-3xl border-0 shadow-md">
           <CardContent className="space-y-3 p-5">
-            <div className="font-semibold">Quick actions</div>
+            <div className="font-semibold text-slate-900">{t.settings.quickActions}</div>
             <Button variant="outline" className="h-11 w-full rounded-2xl" onClick={() => setCurrent("home")}>
-              Go to Home
+              {t.settings.goToHome}
             </Button>
             <Button variant="outline" className="h-11 w-full rounded-2xl" onClick={onReset}>
-              Reset sample data
+              {t.settings.resetData}
             </Button>
             <Button variant="outline" className="h-11 w-full rounded-2xl" onClick={onSignOut}>
-              <LogOut className="mr-2 h-4 w-4" /> Sign out
+              <LogOut className="mr-2 h-4 w-4" /> {t.settings.signOut}
             </Button>
           </CardContent>
         </Card>

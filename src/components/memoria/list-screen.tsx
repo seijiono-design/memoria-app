@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { AppShell } from "@/components/memoria/app-shell";
 import { EnrichedAnniversaryItem } from "@/types/memoria";
+import { useLanguage } from "@/lib/memoria/language-context";
 
 export function ListScreen({
   anniversaries,
@@ -13,6 +14,7 @@ export function ListScreen({
   anniversaries: EnrichedAnniversaryItem[];
   onOpenDetail: (id: string) => void;
 }) {
+  const { t } = useLanguage();
   const [selected, setSelected] = useState("All");
   const [query, setQuery] = useState("");
 
@@ -37,21 +39,25 @@ export function ListScreen({
     });
   }, [anniversaries, query, selected]);
 
+  // "All" label adapts to language
+  const allLabel = t.list.all;
+
   return (
-    <AppShell title="All Anniversaries">
+    <AppShell title={t.titles.list}>
       <div className="relative">
         <Search className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search anniversaries"
-          className="rounded-2xl border-0 bg-white pl-9 shadow-sm"
+          placeholder={t.list.search}
+          className="rounded-2xl border-0 bg-white pl-9 shadow-sm text-slate-900 placeholder:text-slate-400"
         />
       </div>
 
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {categories.map((cat) => {
           const Icon = cat.icon;
+          const displayLabel = cat.label === "All" ? allLabel : cat.label;
           const active = selected === cat.label;
           return (
             <button
@@ -62,7 +68,7 @@ export function ListScreen({
               }`}
             >
               <Icon className="h-4 w-4" />
-              {cat.label}
+              {displayLabel}
             </button>
           );
         })}
@@ -78,7 +84,7 @@ export function ListScreen({
                     {item.icon}
                   </div>
                   <div>
-                    <div className="font-semibold">{item.title}</div>
+                    <div className="font-semibold text-slate-900">{item.title}</div>
                     <div className="mt-1 text-sm text-slate-500">{item.date}</div>
                     <div className="mt-2 flex flex-wrap gap-2">
                       <Badge className="rounded-full bg-slate-100 text-slate-800 hover:bg-slate-100">
@@ -86,7 +92,7 @@ export function ListScreen({
                       </Badge>
                       {item.notifyWeekBefore ? (
                         <Badge variant="secondary" className="rounded-full">
-                          1 week alert
+                          {t.detail.weekAlert}
                         </Badge>
                       ) : null}
                       <Badge variant="secondary" className="rounded-full">
@@ -96,7 +102,7 @@ export function ListScreen({
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                  {item.daysLeft}d
+                  {item.daysLeft}{t.list.daysLeft}
                   <ChevronRight className="h-4 w-4 text-slate-400" />
                 </div>
               </div>

@@ -8,6 +8,7 @@ import { AppShell } from "@/components/memoria/app-shell";
 import { IconButton } from "@/components/memoria/icon-button";
 import { ShareSheet } from "@/components/memoria/share-sheet";
 import { EnrichedAnniversaryItem } from "@/types/memoria";
+import { useLanguage } from "@/lib/memoria/language-context";
 
 export function DetailScreen({
   setCurrent,
@@ -20,11 +21,12 @@ export function DetailScreen({
   onUpdate: (id: string, patch: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
 }) {
+  const { t } = useLanguage();
   if (!item) return null;
 
   return (
     <AppShell
-      title="Detail"
+      title={t.titles.detail}
       onBack={() => setCurrent("list")}
       right={
         <IconButton label="Edit anniversary" onClick={() => setCurrent("form")}>
@@ -39,48 +41,48 @@ export function DetailScreen({
               {item.icon}
             </div>
             <div>
-              <div className="text-2xl font-bold">{item.title}</div>
+              <div className="text-2xl font-bold text-slate-900">{item.title}</div>
               <div className="text-sm text-slate-500">{item.date}</div>
             </div>
           </div>
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-2xl bg-rose-50 p-4">
-              <div className="text-sm text-slate-500">Elapsed</div>
-              <div className="mt-2 text-lg font-bold leading-snug">{item.elapsed}</div>
+              <div className="text-sm text-slate-500">{t.detail.elapsed}</div>
+              <div className="mt-2 text-lg font-bold leading-snug text-slate-900">{item.elapsed}</div>
             </div>
             <div className="rounded-2xl bg-orange-50 p-4">
-              <div className="text-sm text-slate-500">Next event</div>
+              <div className="text-sm text-slate-500">{t.detail.nextEvent}</div>
               <div className="mt-2 text-3xl font-black text-slate-800">{item.daysLeft}</div>
-              <div className="text-sm text-slate-500">days left</div>
+              <div className="text-sm text-slate-500">{t.detail.daysLeft}</div>
             </div>
           </div>
           <div className="mt-5">
             <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="text-slate-500">Year progress</span>
-              <span className="font-medium">72%</span>
+              <span className="text-slate-500">{t.detail.yearProgress}</span>
+              <span className="font-medium text-slate-800">72%</span>
             </div>
             <Progress value={72} className="h-2" />
           </div>
           <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="text-sm text-slate-500">Next milestone</div>
-                <div className="mt-1 text-xl font-bold">{item.nextMilestone.label}</div>
+                <div className="text-sm text-slate-500">{t.detail.nextMilestone}</div>
+                <div className="mt-1 text-xl font-bold text-slate-900">{item.nextMilestone.label}</div>
               </div>
               <Badge className="rounded-full bg-slate-900 text-white hover:bg-slate-900">
-                in {item.nextMilestone.daysLeft} days
+                {t.detail.inDays} {item.nextMilestone.daysLeft} {t.detail.days}
               </Badge>
             </div>
           </div>
           <div className="mt-5 rounded-2xl bg-slate-50 p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <div className="text-sm text-slate-500">Total days passed</div>
+              <div className="text-sm text-slate-500">{t.detail.totalDays}</div>
               <Badge variant="secondary" className="rounded-full">
-                milestone {item.nextMilestone.day}
+                {t.detail.milestone} {item.nextMilestone.day}
               </Badge>
             </div>
-            <div className="mt-1 text-2xl font-bold">{item.totalDays.toLocaleString()}</div>
-            <div className="mt-3 text-sm text-slate-600">{item.memo || "No memo yet."}</div>
+            <div className="mt-1 text-2xl font-bold text-slate-900">{item.totalDays.toLocaleString()}</div>
+            <div className="mt-3 text-sm text-slate-600">{item.memo || t.detail.noMemo}</div>
           </div>
         </CardContent>
       </Card>
@@ -91,8 +93,8 @@ export function DetailScreen({
             <div className="flex items-center gap-3">
               <Bell className="h-5 w-5 text-slate-800" />
               <div>
-                <div className="font-medium">1 week alert</div>
-                <div className="text-sm text-slate-500">Push notification enabled</div>
+                <div className="font-medium text-slate-900">{t.detail.weekAlert}</div>
+                <div className="text-sm text-slate-500">{t.detail.weekAlertDesc}</div>
               </div>
             </div>
             <Switch checked={item.notifyWeekBefore} onCheckedChange={(value) => onUpdate(item.id, { notifyWeekBefore: value })} />
@@ -104,8 +106,8 @@ export function DetailScreen({
             <div className="flex items-center gap-3">
               <CalendarDays className="h-5 w-5 text-slate-800" />
               <div>
-                <div className="font-medium">Google Calendar sync</div>
-                <div className="text-sm text-slate-500">Recurring yearly event</div>
+                <div className="font-medium text-slate-900">{t.detail.googleCalendar}</div>
+                <div className="text-sm text-slate-500">{t.detail.googleCalendarDesc}</div>
               </div>
             </div>
             <Switch checked={item.googleCalendar} onCheckedChange={(value) => onUpdate(item.id, { googleCalendar: value })} />
@@ -119,7 +121,7 @@ export function DetailScreen({
 
       <div className="mt-6 grid grid-cols-2 gap-3">
         <Button variant="outline" className="h-12 rounded-2xl" onClick={() => setCurrent("form")}>
-          <Pencil className="mr-2 h-4 w-4" /> Edit
+          <Pencil className="mr-2 h-4 w-4" /> {t.detail.edit}
         </Button>
         <Button
           variant="destructive"
@@ -129,7 +131,7 @@ export function DetailScreen({
             setCurrent("list");
           }}
         >
-          <Trash2 className="mr-2 h-4 w-4" /> Delete
+          <Trash2 className="mr-2 h-4 w-4" /> {t.detail.delete}
         </Button>
       </div>
     </AppShell>
