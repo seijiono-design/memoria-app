@@ -279,7 +279,7 @@ export function ShareSheet({ item }: { item: EnrichedAnniversaryItem }) {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <Button className="h-11 rounded-2xl bg-slate-900 hover:bg-slate-800" onClick={handleDownload}>
+          <Button className="h-11 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white" onClick={handleDownload}>
             {copy.generateImage}
           </Button>
           <Button variant="outline" className="h-11 rounded-2xl">
