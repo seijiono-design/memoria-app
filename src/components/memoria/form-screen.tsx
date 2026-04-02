@@ -175,7 +175,7 @@ export function FormScreen({
             />
           </div>
 
-          <Button onClick={handleSubmit} className="h-12 w-full rounded-2xl bg-slate-800 hover:bg-slate-900">
+          <Button onClick={handleSubmit} className="h-12 w-full rounded-2xl bg-slate-800 hover:bg-slate-900 text-white">
             {initialValue ? t.form.updateAnniversary : t.form.addAnniversary}
           </Button>
         </CardContent>

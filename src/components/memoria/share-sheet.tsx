@@ -36,6 +36,19 @@ export function ShareSheet({ item }: { item: EnrichedAnniversaryItem }) {
     await navigator.clipboard.writeText(text);
   };
 
+  /** Generate the share card as a PNG data URL AND a File object (for Web Share API). */
+  const buildPngAssets = async (): Promise<{ dataUrl: string; file: File } | null> => {
+    try {
+      const dataUrl = await exportCardAsPng();
+      const blob = await fetch(dataUrl).then((r) => r.blob());
+      const file = new File([blob], `memoria-${item.id}.png`, { type: "image/png" });
+      return { dataUrl, file };
+    } catch (e) {
+      console.error("PNG generation failed:", e);
+      return null;
+    }
+  };
+
   const handleDownload = async () => {
     try {
       const dataUrl = await exportCardAsPng();
@@ -47,11 +60,20 @@ export function ShareSheet({ item }: { item: EnrichedAnniversaryItem }) {
     }
   };
 
+  /**
+   * Share via Web Share API, attaching the PNG file when the browser supports it.
+   * Falls back to clipboard copy if sharing is not available.
+   */
   const handleNativeShare = async () => {
     const text = `${copy.caption(item)} ${copy.hashtags.join(" ")}`;
     try {
+      const png = await buildPngAssets();
       if (navigator.share) {
-        await navigator.share({ title: item.title, text, url: shareUrl });
+        const shareData: ShareData = { title: item.title, text, url: shareUrl };
+        if (png && navigator.canShare?.({ files: [png.file] })) {
+          shareData.files = [png.file];
+        }
+        await navigator.share(shareData);
         setStatus(copy.shareSuccess);
         return;
       }
@@ -63,12 +85,63 @@ export function ShareSheet({ item }: { item: EnrichedAnniversaryItem }) {
     }
   };
 
+  /**
+   * Open an SNS share flow.
+   * Strategy for every platform:
+   *  1. Try Web Share API with the PNG file attached (works on mobile Safari / Android Chrome).
+   *  2. If unavailable or declined, auto-download the PNG so the user has it in their camera
+   *     roll, then open the platform's web share intent.
+   */
   const openShareWindow = async (type: string) => {
     const encodedUrl = encodeURIComponent(shareUrl);
     const encodedXText = encodeURIComponent(`${copy.xText(item)} ${copy.hashtags.join(" ")}`);
     const encodedLineText = encodeURIComponent(`${copy.lineText(item)} ${shareUrl}`);
 
+    if (type === "instagram") {
+      // Instagram has no web intent — always use native share with PNG
+      const png = await buildPngAssets();
+      try {
+        if (navigator.share) {
+          const shareData: ShareData = {
+            title: item.title,
+            text: `${copy.instagramText(item)} ${copy.hashtags.join(" ")}`,
+          };
+          if (png && navigator.canShare?.({ files: [png.file] })) {
+            shareData.files = [png.file];
+          }
+          await navigator.share(shareData);
+          setStatus(copy.shareSuccess);
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      // Last-resort fallback
+      await handleNativeShare();
+      return;
+    }
+
     if (type === "x") {
+      const png = await buildPngAssets();
+      // Try native share with PNG on mobile
+      if (png && navigator.share && navigator.canShare?.({ files: [png.file] })) {
+        try {
+          await navigator.share({
+            title: item.title,
+            text: `${copy.xText(item)} ${copy.hashtags.join(" ")}`,
+            files: [png.file],
+          });
+          setStatus(copy.shareSuccess);
+          return;
+        } catch (e) {
+          // AbortError = user cancelled; other errors fall through to web intent
+        }
+      }
+      // Fallback: save PNG locally then open X web intent
+      if (png) {
+        downloadDataUrl(png.dataUrl, `memoria-${item.id}.png`);
+        setStatus(copy.pngExported);
+      }
       window.open(
         `https://twitter.com/intent/tweet?text=${encodedXText}&url=${encodedUrl}`,
         "_blank",
@@ -77,12 +150,27 @@ export function ShareSheet({ item }: { item: EnrichedAnniversaryItem }) {
       return;
     }
 
-    if (type === "instagram") {
-      await handleNativeShare();
-      return;
-    }
-
     if (type === "line") {
+      const png = await buildPngAssets();
+      // Try native share with PNG on mobile
+      if (png && navigator.share && navigator.canShare?.({ files: [png.file] })) {
+        try {
+          await navigator.share({
+            title: item.title,
+            text: `${copy.lineText(item)} ${shareUrl}`,
+            files: [png.file],
+          });
+          setStatus(copy.shareSuccess);
+          return;
+        } catch (e) {
+          // Fall through
+        }
+      }
+      // Fallback: save PNG locally then open LINE web intent
+      if (png) {
+        downloadDataUrl(png.dataUrl, `memoria-${item.id}.png`);
+        setStatus(copy.pngExported);
+      }
       window.open(
         `https://social-plugins.line.me/lineit/share?url=${encodedUrl}&text=${encodedLineText}`,
         "_blank",
@@ -91,6 +179,7 @@ export function ShareSheet({ item }: { item: EnrichedAnniversaryItem }) {
       return;
     }
 
+    // Copy link
     try {
       await copyToClipboard(shareUrl);
       setStatus(copy.copied);
