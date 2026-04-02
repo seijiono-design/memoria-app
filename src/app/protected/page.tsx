@@ -157,10 +157,10 @@ export default function ProtectedPage() {
   };
 
   // ── Reset ────────────────────────────────────────────────────────────────
+  // "Reset sample data" clears ALL anniversaries so the user starts fresh.
   const handleReset = () => {
-    setAnniversaries(initialAnniversaries);
-    setCategories(defaultCategories);
-    setSelectedId("2");
+    setAnniversaries([]);
+    setSelectedId("");
     setCurrent("home");
   };
 

@@ -221,7 +221,7 @@ export const translations: Record<Lang, T> = {
       connected: "Connected",
       quickActions: "Quick actions",
       goToHome: "Go to Home",
-      resetData: "Reset sample data",
+      resetData: "Delete all data",
       signOut: "Sign out",
     },
     share: {
@@ -332,7 +332,7 @@ export const translations: Record<Lang, T> = {
       connected: "接続済み",
       quickActions: "クイックアクション",
       goToHome: "ホームへ",
-      resetData: "サンプルデータをリセット",
+      resetData: "データをすべて削除",
       signOut: "サインアウト",
     },
     share: {
