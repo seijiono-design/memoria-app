@@ -85,24 +85,29 @@ export default function ProtectedPage() {
     const nextId = item.id || String(Date.now());
     let nextItem: AnniversaryItem = { ...item, id: nextId };
 
-    // Google Calendar sync
+    // Google Calendar sync — wrapped in try-catch so a failed sync
+    // never prevents the anniversary from being saved locally.
     if (providerToken) {
-      const existing = anniversaries.find((a) => a.id === nextId);
+      try {
+        const existing = anniversaries.find((a) => a.id === nextId);
 
-      if (nextItem.googleCalendar) {
-        if (existing?.calendarEventId) {
-          // Update existing calendar event
-          await updateCalendarEvent(providerToken, existing.calendarEventId, nextItem);
-          nextItem = { ...nextItem, calendarEventId: existing.calendarEventId };
-        } else {
-          // Create new calendar event
-          const eventId = await createCalendarEvent(providerToken, nextItem);
-          if (eventId) nextItem = { ...nextItem, calendarEventId: eventId };
+        if (nextItem.googleCalendar) {
+          if (existing?.calendarEventId) {
+            // Update existing calendar event
+            await updateCalendarEvent(providerToken, existing.calendarEventId, nextItem);
+            nextItem = { ...nextItem, calendarEventId: existing.calendarEventId };
+          } else {
+            // Create new calendar event
+            const eventId = await createCalendarEvent(providerToken, nextItem);
+            if (eventId) nextItem = { ...nextItem, calendarEventId: eventId };
+          }
+        } else if (existing?.calendarEventId) {
+          // googleCalendar was turned off — delete the event
+          await deleteCalendarEvent(providerToken, existing.calendarEventId);
+          nextItem = { ...nextItem, calendarEventId: undefined };
         }
-      } else if (existing?.calendarEventId) {
-        // googleCalendar was turned off — delete the event
-        await deleteCalendarEvent(providerToken, existing.calendarEventId);
-        nextItem = { ...nextItem, calendarEventId: undefined };
+      } catch (calendarError) {
+        console.error("Calendar sync failed, saving locally:", calendarError);
       }
     }
 
@@ -126,16 +131,21 @@ export default function ProtectedPage() {
 
     let finalPatch = { ...patch };
 
-    // Handle googleCalendar toggle in-place
+    // Handle googleCalendar toggle in-place — wrapped in try-catch so a
+    // failed sync never prevents the local update from being applied.
     if ("googleCalendar" in patch && providerToken) {
-      const mergedItem = { ...existing, ...patch } as AnniversaryItem;
+      try {
+        const mergedItem = { ...existing, ...patch } as AnniversaryItem;
 
-      if (patch.googleCalendar === true) {
-        const eventId = await createCalendarEvent(providerToken, mergedItem);
-        if (eventId) finalPatch = { ...finalPatch, calendarEventId: eventId };
-      } else if (patch.googleCalendar === false && existing.calendarEventId) {
-        await deleteCalendarEvent(providerToken, existing.calendarEventId);
-        finalPatch = { ...finalPatch, calendarEventId: undefined };
+        if (patch.googleCalendar === true) {
+          const eventId = await createCalendarEvent(providerToken, mergedItem);
+          if (eventId) finalPatch = { ...finalPatch, calendarEventId: eventId };
+        } else if (patch.googleCalendar === false && existing.calendarEventId) {
+          await deleteCalendarEvent(providerToken, existing.calendarEventId);
+          finalPatch = { ...finalPatch, calendarEventId: undefined };
+        }
+      } catch (calendarError) {
+        console.error("Calendar sync failed, updating locally:", calendarError);
       }
     }
 
@@ -149,7 +159,11 @@ export default function ProtectedPage() {
     const existing = anniversaries.find((a) => a.id === id);
 
     if (providerToken && existing?.calendarEventId) {
-      await deleteCalendarEvent(providerToken, existing.calendarEventId);
+      try {
+        await deleteCalendarEvent(providerToken, existing.calendarEventId);
+      } catch (calendarError) {
+        console.error("Calendar event deletion failed:", calendarError);
+      }
     }
 
     setAnniversaries((prev) => prev.filter((a) => a.id !== id));

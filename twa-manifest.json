@@ -1,0 +1,38 @@
+{
+  "packageId": "com.seijiono.memoria",
+  "host": "memoria-app-seijiono-4637s-projects.vercel.app",
+  "name": "Memoria - 記念日管理",
+  "launcherName": "Memoria",
+  "display": "standalone",
+  "themeColor": "#DC5078",
+  "navigationColor": "#DC5078",
+  "navigationColorDark": "#DC5078",
+  "navigationDividerColor": "#DC5078",
+  "navigationDividerColorDark": "#DC5078",
+  "backgroundColor": "#ffffff",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://memoria-app-seijiono-4637s-projects.vercel.app/icons/icon-512x512.png",
+  "maskableIconUrl": "https://memoria-app-seijiono-4637s-projects.vercel.app/icons/icon-512x512.png",
+  "monochromeIconUrl": "https://memoria-app-seijiono-4637s-projects.vercel.app/icons/icon-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "memoria"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://memoria-app-seijiono-4637s-projects.vercel.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "orientation": "portrait",
+  "fingerprints": []
+}
