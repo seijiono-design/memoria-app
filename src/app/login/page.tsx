@@ -20,7 +20,7 @@ export default function LoginPage() {
       provider: "google",
       options: {
         // Request Google Calendar access alongside basic profile
-        scopes: "https://www.googleapis.com/auth/calendar",
+        scopes: "https://www.googleapis.com/auth/calendar.events",
         redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: "offline",
