@@ -6,7 +6,7 @@ import { Logo } from "@/components/memoria/logo";
 import { useLanguage } from "@/lib/memoria/language-context";
 import { Lang } from "@/lib/memoria/i18n";
 
-export function AuthScreen({ onContinue }: { onContinue: () => void }) {h
+export function AuthScreen({ onContinue }: { onContinue: () => void }) {
   const { lang, setLang, t } = useLanguage();
 
   return (
