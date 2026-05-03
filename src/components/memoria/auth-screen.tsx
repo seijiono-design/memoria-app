@@ -6,7 +6,7 @@ import { Logo } from "@/components/memoria/logo";
 import { useLanguage } from "@/lib/memoria/language-context";
 import { Lang } from "@/lib/memoria/i18n";
 
-export function AuthScreen({ onContinue }: { onContinue: () => void }) {
+export function AuthScreen({ onContinue }: { onContinue: () => void }) {h
   const { lang, setLang, t } = useLanguage();
 
   return (
@@ -62,6 +62,11 @@ export function AuthScreen({ onContinue }: { onContinue: () => void }) {
               </span>
               {t.auth.continueWithGoogle}
             </Button>
+                        <p className="mt-4 text-center text-xs text-slate-400">
+                                      <a href="/privacy" className="underline hover:text-slate-600">
+                                        {lang === "ja" ? "プライバシーポリシー" : "Privacy Policy"}
+                                      </a>
+                        </p>
           </CardContent>
         </Card>
       </div>
